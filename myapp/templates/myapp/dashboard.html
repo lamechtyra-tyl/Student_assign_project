@@ -1,0 +1,70 @@
+{% extends "myapp/base.html" %}
+{% block title %}Dashboard | StudyTrack{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+    <div>
+        <p class="eyebrow mb-2">YOUR STUDY SPACE</p>
+        <h1 class="page-title mb-1">Welcome back, {{ user.first_name|default:user.username }}</h1>
+        <p class="text-secondary mb-0">A clear plan makes every deadline feel manageable.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'assignment_create' %}">＋ Add assignment</a>
+</div>
+
+<section class="row g-3 mb-4" aria-label="Assignment summary">
+    <div class="col-12 col-sm-4">
+        <div class="summary-card">
+            <span class="summary-label">Total assignments</span>
+            <strong>{{ counts.total }}</strong>
+            <span class="summary-note">Across all your subjects</span>
+        </div>
+    </div>
+    <div class="col-12 col-sm-4">
+        <div class="summary-card summary-pending">
+            <span class="summary-label">Pending</span>
+            <strong>{{ counts.pending }}</strong>
+            <span class="summary-note">Ready for your next study session</span>
+        </div>
+    </div>
+    <div class="col-12 col-sm-4">
+        <div class="summary-card summary-completed">
+            <span class="summary-label">Completed</span>
+            <strong>{{ counts.completed }}</strong>
+            <span class="summary-note">Great work, keep it up</span>
+        </div>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+        <div>
+            <p class="eyebrow mb-1">STAY AHEAD</p>
+            <h2 class="section-title mb-0">Upcoming deadlines</h2>
+        </div>
+        <a class="text-link" href="{% url 'assignment_list' %}">All assignments →</a>
+    </div>
+    {% if upcoming_assignments %}
+        <div class="deadline-list">
+            {% for assignment in upcoming_assignments %}
+                <div class="deadline-item">
+                    <div class="deadline-date">
+                        <span>{{ assignment.due_date|date:"M" }}</span>
+                        <strong>{{ assignment.due_date|date:"d" }}</strong>
+                    </div>
+                    <div class="flex-grow-1 min-w-0">
+                        <a class="assignment-title" href="{% url 'assignment_update' assignment.pk %}">{{ assignment.title }}</a>
+                        <div class="small text-secondary">{{ assignment.subject }}</div>
+                    </div>
+                    <span class="badge priority-{{ assignment.priority }}">{{ assignment.get_priority_display }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">✓</div>
+            <h3>You're all caught up</h3>
+            <p class="text-secondary mb-3">No pending deadlines coming up. Add an assignment whenever you're ready.</p>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'assignment_create' %}">Add an assignment</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

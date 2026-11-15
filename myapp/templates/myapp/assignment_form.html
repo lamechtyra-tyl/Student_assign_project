@@ -1,0 +1,33 @@
+{% extends "myapp/base.html" %}
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} assignment | StudyTrack{% endblock %}
+{% block content %}
+<div class="form-page">
+    <a class="back-link" href="{% url 'assignment_list' %}"><span aria-hidden="true">←</span> Back to assignments</a>
+    <section class="panel form-panel mt-3">
+        <div class="form-heading">
+            <span class="form-mark" aria-hidden="true">✦</span>
+            <p class="eyebrow mb-2">STUDY PLANNER</p>
+            <h1 class="page-title mb-2">{% if object %}Edit assignment{% else %}Add an assignment{% endif %}</h1>
+            <p class="text-secondary mb-0">Add the details so you can stay on top of your work.</p>
+        </div>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+            {% for field in form %}
+                <div class="form-field mb-3">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                    {% for error in field.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                </div>
+            {% endfor %}
+            <div class="form-actions d-flex flex-column flex-sm-row gap-2 pt-2">
+                <button class="btn btn-primary px-4" type="submit">{% if object %}Save changes{% else %}Create assignment{% endif %}</button>
+                <a class="btn btn-light" href="{% url 'assignment_list' %}">Cancel</a>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

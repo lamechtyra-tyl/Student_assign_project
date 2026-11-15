@@ -1,0 +1,21 @@
+{% extends "myapp/base.html" %}
+{% block title %}Delete assignment | StudyTrack{% endblock %}
+{% block content %}
+<div class="form-page">
+    <a class="back-link" href="{% url 'assignment_list' %}"><span aria-hidden="true">←</span> Back to assignments</a>
+    <section class="panel form-panel confirm-panel mt-3">
+        <div class="confirm-mark" aria-hidden="true">!</div>
+        <p class="eyebrow mb-2">REMOVE ASSIGNMENT</p>
+        <h1 class="page-title mb-2">Delete this assignment?</h1>
+        <p class="text-secondary mb-0">“{{ object.title }}” will be permanently removed from your planner.</p>
+        <div class="delete-warning mt-4">
+            This action cannot be undone.
+        </div>
+        <form method="post" class="form-actions d-flex flex-column flex-sm-row gap-2 pt-3">
+            {% csrf_token %}
+            <button class="btn btn-danger px-4" type="submit">Delete assignment</button>
+            <a class="btn btn-light" href="{% url 'assignment_list' %}">Cancel</a>
+        </form>
+    </section>
+</div>
+{% endblock %}

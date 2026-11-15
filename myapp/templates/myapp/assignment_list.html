@@ -1,0 +1,80 @@
+{% extends "myapp/base.html" %}
+{% block title %}Assignments | StudyTrack{% endblock %}
+{% block content %}
+<header class="assignment-list-heading d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+    <div>
+        <p class="eyebrow mb-2">YOUR WORKLOAD</p>
+        <h1 class="page-title mb-1">Assignments</h1>
+        <p class="text-secondary mb-0">Keep every subject and deadline in one place.</p>
+    </div>
+    <a class="btn btn-primary px-3" href="{% url 'assignment_create' %}">
+        <span aria-hidden="true">＋</span> Add assignment
+    </a>
+</header>
+
+<section class="panel assignment-list-panel">
+    <div class="assignment-toolbar d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-3">
+        <div>
+            <h2 class="section-title mb-1">All assignments</h2>
+            <span class="assignment-count">{{ assignments|length }} assignment{{ assignments|length|pluralize }}</span>
+        </div>
+        <form method="get" class="filter-form">
+            <label for="status-filter" class="visually-hidden">Filter by status</label>
+            <select class="form-select form-select-sm" id="status-filter" name="status"
+                    aria-label="Filter assignments by status" onchange="this.form.submit()">
+                <option value="">All statuses</option>
+                <option value="pending" {% if selected_status == "pending" %}selected{% endif %}>Pending</option>
+                <option value="completed" {% if selected_status == "completed" %}selected{% endif %}>Completed</option>
+            </select>
+        </form>
+    </div>
+    {% if assignments %}
+        <div class="table-responsive">
+            <table class="table align-middle assignment-table mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">Assignment</th>
+                        <th scope="col">Due date</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assignment in assignments %}
+                        <tr>
+                            <td>
+                                <a class="assignment-title" href="{% url 'assignment_update' assignment.pk %}">{{ assignment.title }}</a>
+                                <div class="small text-secondary mt-1">{{ assignment.subject }}</div>
+                            </td>
+                            <td class="text-nowrap">{{ assignment.due_date|date:"M d, Y" }}</td>
+                            <td><span class="badge priority-{{ assignment.priority }}">{{ assignment.get_priority_display }}</span></td>
+                            <td>
+                                <form method="post" action="{% url 'assignment_toggle_status' assignment.pk %}">
+                                    {% csrf_token %}
+                                    <button class="badge status-{{ assignment.status }} status-button" type="submit" aria-label="Mark {{ assignment.title }} {% if assignment.status == 'pending' %}completed{% else %}pending{% endif %}">
+                                        {{ assignment.get_status_display }}
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <div class="d-inline-flex gap-1">
+                                    <a class="btn btn-sm btn-light" href="{% url 'assignment_update' assignment.pk %}" aria-label="Edit {{ assignment.title }}">Edit</a>
+                                    <a class="btn btn-sm btn-light text-danger" href="{% url 'assignment_delete' assignment.pk %}" aria-label="Delete {{ assignment.title }}">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon" aria-hidden="true">＋</div>
+            <h3>No assignments found</h3>
+            <p class="text-secondary mb-3">{% if selected_status %}Try another status filter or add a new assignment.{% else %}Add your first assignment to start organizing your study plan.{% endif %}</p>
+            <a class="btn btn-primary btn-sm" href="{% url 'assignment_create' %}">Add an assignment</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
